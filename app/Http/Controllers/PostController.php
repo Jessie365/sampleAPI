@@ -21,8 +21,14 @@ class PostController extends Controller
             $response = [
                 'posts' => []
             ];
+            $statusCode = 200;
+            //get posts order by creation date
+            //$posts = Post::orderBy('created_at', 'desc')->get();
 
-            $posts = Post::orderBy('created_at', 'desc')->get();
+            //get posts order by comments count
+            $posts = Post::selectRaw('posts.*, count(comments.id) as comments_count')
+                ->leftjoin('comments', 'comments.post_id', '=', 'posts.id')->groupBy('posts.id')
+                ->orderBy('comments_count', 'desc')->get();
             $statusCode = 200;
             foreach($posts as $post) {
                 $response['posts'][] = [
@@ -30,7 +36,8 @@ class PostController extends Controller
                     'title' => $post->title,
                     'body' => $post->body,
                     'user_id' => $post->user_id,
-                    'created_at' => $post->created_at
+                    'created_at' => $post->created_at,
+                    'comments' => $post->comments
                 ];
             }
         } catch (Exception $ex) {
