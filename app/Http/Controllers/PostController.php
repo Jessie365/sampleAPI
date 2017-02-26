@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Tymon\JWTAuth\Facades\JWTAuth;
-use App\Post;
 use Validator;
+use App\Post;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Input;
