@@ -25,6 +25,8 @@ Route::get('/', function () {
 
 
 Route::group(['prefix' => 'api'], function() {
+    //Register User
+    Route::post('user', 'UserController@store');
     //Authenticate User
     Route::post('auth', 'AuthenticateController@authenticate');
     Route::post('posts', 'PostController@store')->middleware('jwt.auth'); //jwt.refresh

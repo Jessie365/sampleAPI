@@ -7,6 +7,7 @@ use App\Post;
 use Validator;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Input;
 
 class PostController extends Controller
 {
@@ -22,14 +23,17 @@ class PostController extends Controller
                 'posts' => []
             ];
             $statusCode = 200;
-            //get posts order by creation date
-            //$posts = Post::orderBy('created_at', 'desc')->get();
 
-            //get posts order by comments count
-            $posts = Post::selectRaw('posts.*, count(comments.id) as comments_count')
-                ->leftjoin('comments', 'comments.post_id', '=', 'posts.id')->groupBy('posts.id')
-                ->orderBy('comments_count', 'desc')->get();
-            $statusCode = 200;
+            $orderBy = Input::get('orderBy');
+
+            if($orderBy == 'comments') {
+                //get posts order by comments count
+                $posts = Post::getPostsByCommentsCount();
+            } else {
+                //get posts order by creation date
+                $posts = Post::getPostsByCreatedAt();
+            }
+
             foreach($posts as $post) {
                 $response['posts'][] = [
                     'id' => $post->id,
