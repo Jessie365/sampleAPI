@@ -43,6 +43,10 @@ class UserController extends Controller
     }
 
     public function store(Request $request) {
+        $response = [
+            'message' => 'User created Successfully'
+        ];
+
         //validate the input
         $validator = Validator::make($request->all(), [
             'name' => 'required|min:3|max:255',
@@ -53,7 +57,9 @@ class UserController extends Controller
         //check if there are validation errors
         $errorsArray = $validator->errors()->toArray();
         if (!empty($errorsArray)) {
-            return response()->json($errorsArray);
+            $response['message'] = 'Validation Failed';
+            $response['validationFieldErrors'] = $errorsArray;
+            return response()->json($response, 400);
         }
 
         //create new post and fill the user id
@@ -64,7 +70,7 @@ class UserController extends Controller
         ]);
 
         //save it and return response
-        return response()->json('User created Successfully', 201);
+        return response()->json($response, 201);
     }
 
 }

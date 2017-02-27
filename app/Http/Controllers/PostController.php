@@ -25,7 +25,6 @@ class PostController extends Controller
             $statusCode = 200;
 
             $orderBy = Input::get('orderBy');
-
             if($orderBy == 'comments') {
                 //get posts order by comments count
                 $posts = Post::getPostsByCommentsCount();
@@ -40,7 +39,7 @@ class PostController extends Controller
                     'title' => $post->title,
                     'body' => $post->body,
                     'user_id' => $post->user_id,
-                    'created_at' => $post->created_at,
+                    'created_at' => $post->created_at->toDateTimeString(),
                     'comments' => $post->comments
                 ];
             }
@@ -69,6 +68,8 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
+        $response['message'] = 'Post created Successfully';
+
         $user = JWTAuth::parseToken()->authenticate();
         if (!$user) {
             return response()->json(['User Not Found'], 404);
@@ -82,7 +83,9 @@ class PostController extends Controller
         //check if there are validation errors
         $errorsArray = $validator->errors()->toArray();
         if (!empty($errorsArray)) {
-            return response()->json($errorsArray);
+            $response['message'] = 'Validation Failed';
+            $response['validationFieldErrors'] = $errorsArray;
+            return response()->json($response, 400);
         }
 
         //create new post and fill the user id
@@ -93,7 +96,7 @@ class PostController extends Controller
         ]);
 
         //save it and return response
-        return response()->json('Post created Successfully', 201);
+        return response()->json($response, 201);
     }
 
     /**

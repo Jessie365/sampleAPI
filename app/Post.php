@@ -20,8 +20,10 @@ class Post extends Model
     }
 
     public static function getPostsByCommentsCount() {
-        return Post::selectRaw('posts.*, count(comments.id) as comments_count')
-            ->leftjoin('comments', 'comments.post_id', '=', 'posts.id')->groupBy('posts.id')
+
+        return Post::selectRaw('posts.id, posts.title, posts.body, posts.user_id, posts.created_at, count(comments.id) as comments_count')
+            ->leftjoin('comments', 'comments.post_id', '=', 'posts.id')
+            ->groupBy('posts.id', 'posts.title', 'posts.body', 'posts.user_id', 'posts.created_at')
             ->orderBy('comments_count', 'desc')->get();
     }
 

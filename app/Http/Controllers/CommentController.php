@@ -40,14 +40,18 @@ class CommentController extends Controller
      */
     public function store(Request $request, $postId)
     {
+        $response['message'] = 'Comment created Successfully';
+
         $user = JWTAuth::parseToken()->authenticate();
         if (!$user) {
-            return response()->json(['User Not Found'], 404);
+            $response['message'] = 'User Not Found';
+            return response()->json($response, 400);
         }
 
         $post = Post::find($postId);
         if (!$post) {
-            return response()->json(['Post Not Found'], 404);
+            $response['message'] = 'Post Not Found';
+            return response()->json($response, 400);
         }
 
         //validate the input
@@ -57,7 +61,9 @@ class CommentController extends Controller
         //check if there are validation errors
         $errorsArray = $validator->errors()->toArray();
         if (!empty($errorsArray)) {
-            return response()->json($errorsArray);
+            $response['message'] = 'Validation Failed';
+            $response['validationFieldErrors'] = $errorsArray;
+            return response()->json($response, 400);
         }
 
         //create new comment and fill the post_id and the user_id
@@ -68,7 +74,7 @@ class CommentController extends Controller
         ]);
 
         //save it and return response
-        return response()->json('Comment created Successfully', 201);
+        return response()->json($response, 201);
     }
 
     /**
